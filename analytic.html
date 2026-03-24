@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Finance Tracker • Analytics</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    /* ... I'm keeping your beautiful CSS root and layout ... */
+    :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --gray: #6b7280; --light: #f3f4f6; --dark: #111827; --sidebar-width: 260px; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, sans-serif; }
+    body { display: flex; background: var(--light); min-height: 100vh; }
+    .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid #e5e7eb; padding: 1.5rem 0; height: 100vh; position: sticky; top: 0; }
+    .nav-item a { display: flex; align-items: center; padding: 0.95rem 1.5rem; color: var(--gray); text-decoration: none; font-weight: 500; }
+    .nav-item a.active { background: #eff6ff; color: var(--primary); }
+    .nav-item i { margin-right: 1rem; width: 24px; text-align: center; }
+    .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+    
+    /* Header */
+    .header { background: white; border-bottom: 1px solid #e5e7eb; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; margin: -2rem -2rem 2rem -2rem; }
+    .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+    /* Metric Cards */
+    .overview-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+    .metric-card { background: white; border-radius: 12px; padding: 1.6rem; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .metric-label { color: var(--gray); font-size: 0.95rem; margin-bottom: 0.6rem; }
+    .metric-value { font-size: 2rem; font-weight: 700; margin-bottom: 0.4rem; }
+
+    /* Visual Charts Area */
+    .chart-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem; }
+    .chart-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    
+    /* Simple CSS Bar Chart */
+    .bar-container { display: flex; align-items: flex-end; gap: 10px; height: 200px; padding-top: 20px; border-bottom: 2px solid #eee; }
+    .bar { flex: 1; background: var(--primary); border-radius: 4px 4px 0 0; position: relative; min-height: 5px; transition: height 0.5s ease; }
+    .bar:hover { filter: brightness(1.2); }
+    .bar-label { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--gray); }
+
+    .category-list { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .category-item { display: flex; justify-content: space-between; padding: 1.2rem 1.8rem; border-bottom: 1px solid #f1f5f9; }
+    .category-amount.expense { color: var(--danger); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div style="padding: 0 1.5rem 2rem; font-size: 1.6rem; font-weight: 700; color: var(--primary); text-align: center;">Finance</div>
+    <ul class="nav-list">
+      <li class="nav-item"><a href="main.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="account.html"><i class="fas fa-wallet"></i><span>Accounts</span></a></li>
+      <li class="nav-item"><a href="analytic.html" class="active"><i class="fas fa-chart-pie"></i><span>Analytics</span></a></li>
+      <li class="nav-item"><a href="trans.html"><i class="fas fa-exchange-alt"></i><span>Transactions</span></a></li>
+      <li class="nav-item"><a href="category.html"><i class="fas fa-tags"></i><span>Categories</span></a></li>
+      <li class="nav-item"><a href="setting.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <header class="header">
+      <h1>Financial Analytics</h1>
+      <div class="user-area">
+        <div class="user-avatar" id="uInit">IK</div>
+      </div>
+    </header>
+
+    <div class="overview-cards">
+      <div class="metric-card">
+        <div class="metric-label">Total Income</div>
+        <div class="metric-value" id="totalInc" style="color:var(--success)">₦ 0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total Expenses</div>
+        <div class="metric-value" id="totalExp" style="color:var(--danger)">₦ 0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Savings Rate</div>
+        <div class="metric-value" id="saveRate">0%</div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3 style="margin-bottom:1rem">Daily Expense Trend</h3>
+        <div class="bar-container" id="barChart">
+          </div>
+      </div>
+      <div class="chart-card">
+        <h3 style="margin-bottom:1rem">Top Categories</h3>
+        <div id="catSummary" style="font-size: 0.9rem;">
+          </div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:1rem">Detailed Category Breakdown</h3>
+    <div class="category-list" id="fullCatList">
+      </div>
+  </main>
+
+  <script>
+    function loadAnalytics() {
+      const txns = JSON.parse(localStorage.getItem('myTransactions')) || [];
+      const user = localStorage.getItem('userName') || 'Guest';
+      document.getElementById('uInit').innerText = user.charAt(0).toUpperCase();
+
+      let inc = 0, exp = 0;
+      const catTotals = {};
+      const dailyData = {};
+
+      txns.forEach(t => {
+        const amt = Math.abs(t.amt);
+        if(t.type === 'income') {
+          inc += amt;
+        } else {
+          exp += amt;
+          // Group by Category
+          catTotals[t.cat] = (catTotals[t.cat] || 0) + amt;
+          // Group by Day (for trend)
+          const date = t.date; 
+          dailyData[date] = (dailyData[date] || 0) + amt;
+        }
+      });
+
+      // Update Metric Cards
+      const fmt = (v) => "₦ " + v.toLocaleString();
+      document.getElementById('totalInc').innerText = fmt(inc);
+      document.getElementById('totalExp').innerText = fmt(exp);
+      const rate = inc > 0 ? Math.round(((inc - exp) / inc) * 100) : 0;
+      document.getElementById('saveRate').innerText = (rate < 0 ? 0 : rate) + "%";
+
+      // Update Bar Chart (Last 7 days of expenses)
+      const barChart = document.getElementById('barChart');
+      barChart.innerHTML = '';
+      const days = Object.keys(dailyData).sort().slice(-7);
+      const maxExp = Math.max(...Object.values(dailyData), 1);
+
+      days.forEach(d => {
+        const height = (dailyData[d] / maxExp) * 100;
+        barChart.innerHTML += `
+          <div class="bar" style="height: ${height}%">
+            <span class="bar-label">${d.split('-')[2] || d}</span>
+          </div>`;
+      });
+
+      // Update Category List
+      const catList = document.getElementById('fullCatList');
+      const catSum = document.getElementById('catSummary');
+      catList.innerHTML = '';
+      catSum.innerHTML = '';
+
+      Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]).forEach(c => {
+        const percent = exp > 0 ? Math.round((catTotals[c] / exp) * 100) : 0;
+        
+        catSum.innerHTML += `<div style="margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between"><span>${c}</span><span>${percent}%</span></div>
+          <div style="width:100%; height:6px; background:#eee; border-radius:10px; margin-top:4px;">
+            <div style="width:${percent}%; height:100%; background:var(--primary); border-radius:10px;"></div>
+          </div>
+        </div>`;
+
+        catList.innerHTML += `
+          <div class="category-item">
+            <span class="category-name">${c}</span>
+            <div>
+              <span class="category-amount expense">₦ ${catTotals[c].toLocaleString()}</span>
+              <span style="color:gray; font-size:0.8rem; margin-left:10px;">${percent}%</span>
+            </div>
+          </div>`;
+      });
+
+      if(txns.length === 0) {
+        catList.innerHTML = "<div style='padding:20px; text-align:center; color:gray;'>No data to analyze yet.</div>";
+      }
+    }
+
+    window.onload = loadAnalytics;
+  </script>
+</body>
+</html>

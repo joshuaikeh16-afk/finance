@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Finance Tracker • Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    /* ... I am keeping your exact CSS from the prompt so the design doesn't change ... */
+    :root {
+      --primary: #2563eb; --primary-dark: #1d4ed8; --success: #10b981;
+      --warning: #f59e0b; --danger: #ef4444; --gray: #6b7280;
+      --light: #f3f4f6; --dark: #111827; --sidebar-width: 260px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: system-ui, sans-serif; background: var(--light); color: var(--dark); min-height: 100vh; display: flex; }
+    .layout { display: flex; flex: 1; }
+    .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid #e5e7eb; padding: 1.5rem 0; height: 100vh; position: sticky; top: 0; }
+    .logo { padding: 0 1.5rem 2rem; font-size: 1.6rem; font-weight: 700; color: var(--primary); text-align: center; }
+    .nav-list { list-style: none; }
+    .nav-item a { display: flex; align-items: center; padding: 0.95rem 1.5rem; color: var(--gray); text-decoration: none; font-weight: 500; transition: all 0.2s; }
+    .nav-item a:hover, .nav-item a.active { background: #eff6ff; color: var(--primary); }
+    .nav-item i { margin-right: 1rem; width: 24px; text-align: center; }
+    .header { background: white; border-bottom: 1px solid #e5e7eb; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+    .stat-card { background: white; border-radius: 12px; padding: 1.6rem; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-left: 5px solid var(--primary); }
+    .stat-card.income { border-left-color: var(--success); }
+    .stat-card.expense { border-left-color: var(--danger); }
+    .stat-label { color: var(--gray); font-size: 0.95rem; margin-bottom: 0.6rem; }
+    .stat-value { font-size: 1.8rem; font-weight: 700; }
+    .section-title { font-size: 1.3rem; font-weight: 600; margin: 2rem 0 1.2rem; }
+    .transactions-table { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); width: 100%; }
+    .transactions-table table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 1.1rem 1.5rem; text-align: left; }
+    th { background: #f8fafc; font-weight: 600; color: var(--gray); font-size: 0.9rem; text-transform: uppercase; }
+    .amount.income { color: var(--success); font-weight: 600; }
+    .amount.expense { color: var(--danger); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Finance</div>
+      <ul class="nav-list">
+        <li class="nav-item"><a href="main.html" class="active"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+        <li class="nav-item"><a href="account.html"><i class="fas fa-wallet"></i><span>Accounts</span></a></li>
+        <li class="nav-item"><a href="analytic.html"><i class="fas fa-chart-pie"></i><span>Analytics</span></a></li>
+        <li class="nav-item"><a href="trans.html"><i class="fas fa-exchange-alt"></i><span>Transactions</span></a></li>
+        <li class="nav-item"><a href="category.html"><i class="fas fa-tags"></i><span>Categories</span></a></li>
+        <li class="nav-item"><a href="setting.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+      </ul>
+    </aside>
+
+    <div style="flex:1; display:flex; flex-direction:column;">
+      <header class="header">
+        <div class="header-left"><h1 id="welcomeMessage">Welcome back</h1></div>
+        <div class="user-area">
+          <select id="currencySelector" onchange="updateUI()" style="padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
+            <option value="NGN">₦ NGN</option>
+            <option value="USD">$ USD</option>
+          </select>
+          <div class="user-avatar" id="userInitials">??</div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Balance</div>
+            <div id="totalBalance" class="stat-value">₦ 0</div>
+          </div>
+          <div class="stat-card income">
+            <div class="stat-label">Total Income</div>
+            <div id="totalIn" class="stat-value" style="color:var(--success)">₦ 0</div>
+          </div>
+          <div class="stat-card expense">
+            <div class="stat-label">Total Expenses</div>
+            <div id="totalOut" class="stat-value" style="color:var(--danger)">₦ 0</div>
+          </div>
+        </div>
+
+        <div class="section-title">Recent Transactions</div>
+        <div class="transactions-table">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th></tr>
+            </thead>
+            <tbody id="recentTxnBody">
+              </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const rates = { NGN: 1, USD: 0.00065 };
+
+    function updateUI() {
+      // 1. Get shared data (Starting balance is 0 if empty)
+      const txns = JSON.parse(localStorage.getItem('myTransactions')) || [];
+      const curr = document.getElementById('currencySelector').value;
+      
+      let runningIncome = 0;
+      let runningExpense = 0;
+      const tbody = document.getElementById('recentTxnBody');
+      tbody.innerHTML = '';
+
+      // 2. Loop through ALL transactions for totals
+      txns.forEach((t, index) => {
+        if (t.type === 'income') runningIncome += t.amt;
+        else runningExpense += Math.abs(t.amt);
+
+        // 3. Only show the 5 most recent in the table
+        if (index < 5) {
+          const val = t.amt * rates[curr];
+          const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: curr }).format(val);
+          tbody.innerHTML += `
+            <tr>
+              <td>${t.date}</td>
+              <td>${t.desc}</td>
+              <td>${t.cat}</td>
+              <td class="amount ${t.type}">${fmt}</td>
+            </tr>`;
+        }
+      });
+
+      // 4. If table is empty, show a message
+      if (txns.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:gray;">No transactions yet. Click "Add Transaction" on the Transactions page!</td></tr>';
+      }
+
+      // 5. Update Stat Cards
+      const net = runningIncome - runningExpense;
+      const fmtStat = (v) => new Intl.NumberFormat('en-US', { style: 'currency', currency: curr }).format(v * rates[curr]);
+
+      document.getElementById('totalBalance').innerText = fmtStat(net);
+      document.getElementById('totalIn').innerText = fmtStat(runningIncome);
+      document.getElementById('totalOut').innerText = fmtStat(runningExpense);
+      
+      // Color coding for balance
+      document.getElementById('totalBalance').style.color = net < 0 ? 'var(--danger)' : 'var(--dark)';
+    }
+
+    // Handle User Info
+    const userName = localStorage.getItem('userName') || 'Guest';
+    document.getElementById('welcomeMessage').textContent = `Welcome back, ${userName}`;
+    document.getElementById('userInitials').textContent = userName.charAt(0).toUpperCase();
+
+    // Run on Load
+    window.onload = updateUI;
+  </script>
+</body>
+</html>
