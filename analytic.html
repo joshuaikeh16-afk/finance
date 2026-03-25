@@ -3,104 +3,157 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Finance Tracker • Analytics</title>
+  <title>Finance Tracker • Smart Analytics</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    /* ... I'm keeping your beautiful CSS root and layout ... */
-    :root { --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --gray: #6b7280; --light: #f3f4f6; --dark: #111827; --sidebar-width: 260px; }
-    * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, sans-serif; }
-    body { display: flex; background: var(--light); min-height: 100vh; }
-    .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid #e5e7eb; padding: 1.5rem 0; height: 100vh; position: sticky; top: 0; }
-    .nav-item a { display: flex; align-items: center; padding: 0.95rem 1.5rem; color: var(--gray); text-decoration: none; font-weight: 500; }
-    .nav-item a.active { background: #eff6ff; color: var(--primary); }
-    .nav-item i { margin-right: 1rem; width: 24px; text-align: center; }
-    .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+    /* 1. DYNAMIC COLOR VARIABLES */
+    :root { 
+      --bg-body: #f0f2f5;
+      --bg-panel: #ffffff;
+      --text-main: #1a1a1a;
+      --text-muted: #888888;
+      --border-color: #f0f0f0;
+      --input-bg: #f8fafc;
+      
+      --primary: #4361ee; 
+      --primary-light: #4895ef; 
+      --success: #06d6a0; 
+      --danger: #ef476f; 
+      --warning: #ffd166; 
+      --sidebar-grad: linear-gradient(180deg, #4361ee 0%, #3a0ca3 100%);
+    }
+
+    /* 2. DARK MODE OVERRIDES */
+    body.dark-mode {
+      --bg-body: #0f172a;
+      --bg-panel: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --input-bg: #0f172a;
+      --sidebar-grad: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; transition: background 0.3s ease, color 0.3s ease; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; background: var(--sidebar-grad); color: white; height: 100vh; position: sticky; top: 0; padding-top: 2rem; box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 100; }
+    .logo { padding: 0 2rem 2.5rem; font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+    .nav-item a { display: flex; align-items: center; padding: 1rem 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 500; }
+    .nav-item a.active { background: white; color: var(--primary); border-radius: 0 50px 50px 0; margin-right: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .nav-item i { width: 30px; font-size: 1.1rem; }
+
+    .main-content { flex: 1; padding: 2.5rem 3.5rem; overflow-y: auto; }
     
-    /* Header */
-    .header { background: white; border-bottom: 1px solid #e5e7eb; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; margin: -2rem -2rem 2rem -2rem; }
-    .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
-    /* Metric Cards */
-    .overview-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-    .metric-card { background: white; border-radius: 12px; padding: 1.6rem; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    .metric-label { color: var(--gray); font-size: 0.95rem; margin-bottom: 0.6rem; }
-    .metric-value { font-size: 2rem; font-weight: 700; margin-bottom: 0.4rem; }
-
-    /* Visual Charts Area */
-    .chart-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem; }
-    .chart-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
+    header h1 { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
     
-    /* Simple CSS Bar Chart */
-    .bar-container { display: flex; align-items: flex-end; gap: 10px; height: 200px; padding-top: 20px; border-bottom: 2px solid #eee; }
-    .bar { flex: 1; background: var(--primary); border-radius: 4px 4px 0 0; position: relative; min-height: 5px; transition: height 0.5s ease; }
-    .bar:hover { filter: brightness(1.2); }
-    .bar-label { position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--gray); }
+    .user-badge { 
+      width: 45px; height: 45px; background: var(--bg-panel); border-radius: 15px; 
+      display: flex; align-items: center; justify-content: center; 
+      font-weight: 800; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+    }
 
-    .category-list { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-    .category-item { display: flex; justify-content: space-between; padding: 1.2rem 1.8rem; border-bottom: 1px solid #f1f5f9; }
-    .category-amount.expense { color: var(--danger); font-weight: 600; }
+    /* Cards & Metrics */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+    .card { background: var(--bg-panel); border-radius: 24px; padding: 1.8rem; box-shadow: 0 10px 25px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+    
+    .metric-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+    .metric-value { font-size: 2.2rem; font-weight: 800; margin-top: 0.5rem; }
+
+    /* Visualizer */
+    .viz-container { display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 2rem; margin-bottom: 2.5rem; }
+    .chart-header h3 { font-weight: 800; font-size: 1.1rem; color: var(--text-main); }
+
+    /* Bar Chart Custom Colors */
+    .bar-wrapper { display: flex; align-items: flex-end; justify-content: space-between; height: 220px; padding: 10px 0; border-bottom: 2px solid var(--border-color); }
+    .bar { width: 35px; background: var(--primary-light); border-radius: 8px 8px 4px 4px; position: relative; cursor: pointer; opacity: 0.8; }
+    .bar:hover { background: var(--primary); opacity: 1; transform: scaleX(1.1); }
+    .bar-val { font-size: 0.65rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; opacity: 0; }
+    .bar-label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); }
+
+    /* Progress UI */
+    .progress-bg { height: 8px; background: var(--bg-body); border-radius: 10px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--primary); border-radius: 10px; }
+
+    /* Breakdown List */
+    .breakdown-item { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem; background: var(--bg-panel); border-radius: 16px; margin-bottom: 0.8rem; border: 1px solid var(--border-color); }
+    .tag { font-size: 0.7rem; padding: 4px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; background: var(--bg-body); color: var(--text-muted); }
   </style>
 </head>
 <body>
 
+  <script>
+    (function initTheme() {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
   <aside class="sidebar">
-    <div style="padding: 0 1.5rem 2rem; font-size: 1.6rem; font-weight: 700; color: var(--primary); text-align: center;">Finance</div>
+    <div class="logo"><i class="fas fa-bolt-lightning"></i> Finance</div>
     <ul class="nav-list">
-      <li class="nav-item"><a href="main.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="main.html"><i class="fas fa-grid-2"></i><span>Dashboard</span></a></li>
       <li class="nav-item"><a href="account.html"><i class="fas fa-wallet"></i><span>Accounts</span></a></li>
-      <li class="nav-item"><a href="analytic.html" class="active"><i class="fas fa-chart-pie"></i><span>Analytics</span></a></li>
+      <li class="nav-item"><a href="analytic.html" class="active"><i class="fas fa-chart-line"></i><span>Analytics</span></a></li>
       <li class="nav-item"><a href="trans.html"><i class="fas fa-exchange-alt"></i><span>Transactions</span></a></li>
-      <li class="nav-item"><a href="category.html"><i class="fas fa-tags"></i><span>Categories</span></a></li>
-      <li class="nav-item"><a href="setting.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+      <li class="nav-item"><a href="category.html"><i class="fas fa-layer-group"></i><span>Categories</span></a></li>
+      <li class="nav-item"><a href="setting.html"><i class="fas fa-sliders-h"></i><span>Settings</span></a></li>
     </ul>
   </aside>
 
   <main class="main-content">
-    <header class="header">
-      <h1>Financial Analytics</h1>
-      <div class="user-area">
-        <div class="user-avatar" id="uInit">IK</div>
-      </div>
+    <header>
+      <h1>Intelligence & Insights</h1>
+      <div class="user-badge" id="uInit">??</div>
     </header>
 
-    <div class="overview-cards">
-      <div class="metric-card">
-        <div class="metric-label">Total Income</div>
+    <div class="metrics-grid">
+      <div class="card">
+        <div class="metric-label">Income Inflow</div>
         <div class="metric-value" id="totalInc" style="color:var(--success)">₦ 0</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-label">Total Expenses</div>
+      <div class="card">
+        <div class="metric-label">Expense Outflow</div>
         <div class="metric-value" id="totalExp" style="color:var(--danger)">₦ 0</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-label">Savings Rate</div>
+      <div class="card">
+        <div class="metric-label">Efficiency Rate</div>
         <div class="metric-value" id="saveRate">0%</div>
       </div>
     </div>
 
-    <div class="chart-grid">
-      <div class="chart-card">
-        <h3 style="margin-bottom:1rem">Daily Expense Trend</h3>
-        <div class="bar-container" id="barChart">
-          </div>
+    <div class="viz-container">
+      <div class="card">
+        <div class="chart-header">
+          <h3>Spending Trend</h3>
+          <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">LAST 7 LOGGED DAYS</span>
+        </div>
+        <div class="bar-wrapper" id="barChart"></div>
       </div>
-      <div class="chart-card">
-        <h3 style="margin-bottom:1rem">Top Categories</h3>
-        <div id="catSummary" style="font-size: 0.9rem;">
-          </div>
+
+      <div class="card">
+        <div class="chart-header">
+          <h3>Top Categories</h3>
+        </div>
+        <div id="catSummary"></div>
       </div>
     </div>
 
-    <h3 style="margin-bottom:1rem">Detailed Category Breakdown</h3>
-    <div class="category-list" id="fullCatList">
-      </div>
+    <h3 style="margin-bottom:1.5rem; font-weight:800;">Detailed Breakdown</h3>
+    <div class="breakdown-list" id="fullCatList"></div>
   </main>
 
   <script>
     function loadAnalytics() {
       const txns = JSON.parse(localStorage.getItem('myTransactions')) || [];
-      const user = localStorage.getItem('userName') || 'Guest';
-      document.getElementById('uInit').innerText = user.charAt(0).toUpperCase();
+      
+      // SYNC NAME & INITIALS
+      const user = localStorage.getItem('userName') || 'Guest User';
+      const initials = user.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+      document.getElementById('uInit').innerText = initials;
 
       let inc = 0, exp = 0;
       const catTotals = {};
@@ -112,22 +165,23 @@
           inc += amt;
         } else {
           exp += amt;
-          // Group by Category
           catTotals[t.cat] = (catTotals[t.cat] || 0) + amt;
-          // Group by Day (for trend)
-          const date = t.date; 
-          dailyData[date] = (dailyData[date] || 0) + amt;
+          dailyData[t.date] = (dailyData[t.date] || 0) + amt;
         }
       });
 
-      // Update Metric Cards
-      const fmt = (v) => "₦ " + v.toLocaleString();
+      const fmt = (v) => new Intl.NumberFormat('en-NG', { 
+        style: 'currency', 
+        currency: 'NGN',
+        maximumFractionDigits: 0 
+      }).format(v);
+
       document.getElementById('totalInc').innerText = fmt(inc);
       document.getElementById('totalExp').innerText = fmt(exp);
       const rate = inc > 0 ? Math.round(((inc - exp) / inc) * 100) : 0;
       document.getElementById('saveRate').innerText = (rate < 0 ? 0 : rate) + "%";
 
-      // Update Bar Chart (Last 7 days of expenses)
+      // Build Bar Chart
       const barChart = document.getElementById('barChart');
       barChart.innerHTML = '';
       const days = Object.keys(dailyData).sort().slice(-7);
@@ -135,40 +189,53 @@
 
       days.forEach(d => {
         const height = (dailyData[d] / maxExp) * 100;
+        // Format date better for chart
         barChart.innerHTML += `
-          <div class="bar" style="height: ${height}%">
-            <span class="bar-label">${d.split('-')[2] || d}</span>
+          <div class="bar-group" style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end;">
+            <span class="bar-val">₦${Math.round(dailyData[d]/1000)}k</span>
+            <div class="bar" style="height: ${height}%"></div>
+            <span class="bar-label" style="margin-top:8px;">${d}</span>
           </div>`;
       });
 
-      // Update Category List
+      // Build Categories
       const catList = document.getElementById('fullCatList');
       const catSum = document.getElementById('catSummary');
-      catList.innerHTML = '';
-      catSum.innerHTML = '';
+      catList.innerHTML = ''; catSum.innerHTML = '';
 
-      Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]).forEach(c => {
+      const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
+
+      sortedCats.forEach((c, i) => {
         const percent = exp > 0 ? Math.round((catTotals[c] / exp) * 100) : 0;
         
-        catSum.innerHTML += `<div style="margin-bottom:10px;">
-          <div style="display:flex; justify-content:space-between"><span>${c}</span><span>${percent}%</span></div>
-          <div style="width:100%; height:6px; background:#eee; border-radius:10px; margin-top:4px;">
-            <div style="width:${percent}%; height:100%; background:var(--primary); border-radius:10px;"></div>
-          </div>
-        </div>`;
+        if(i < 4) {
+          catSum.innerHTML += `
+            <div class="cat-row" style="margin-bottom:1.2rem;">
+              <div class="cat-info" style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:700; margin-bottom:6px;">
+                <span>${c}</span><span>${percent}%</span>
+              </div>
+              <div class="progress-bg"><div class="progress-fill" style="width:${percent}%"></div></div>
+            </div>`;
+        }
 
         catList.innerHTML += `
-          <div class="category-item">
-            <span class="category-name">${c}</span>
-            <div>
-              <span class="category-amount expense">₦ ${catTotals[c].toLocaleString()}</span>
-              <span style="color:gray; font-size:0.8rem; margin-left:10px;">${percent}%</span>
+          <div class="breakdown-item">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <span class="tag">${c}</span>
+                <span style="font-weight:700;">${c} Operations</span>
+            </div>
+            <div style="text-align:right">
+                <div style="font-weight:800; color:var(--danger)">- ${fmt(catTotals[c])}</div>
+                <div style="font-size:0.7rem; color:var(--text-muted); font-weight:700;">${percent}% OF TOTAL SPEND</div>
             </div>
           </div>`;
       });
 
       if(txns.length === 0) {
-        catList.innerHTML = "<div style='padding:20px; text-align:center; color:gray;'>No data to analyze yet.</div>";
+        catList.innerHTML = `<div style="text-align:center; padding:5rem; color:var(--text-muted); background:var(--bg-panel); border-radius:24px; border:1px solid var(--border-color);">
+            <i class="fas fa-chart-area" style="font-size:3rem; opacity:0.2; margin-bottom:1rem;"></i>
+            <p>Insufficient data to generate intelligence reports.</p>
+        </div>`;
       }
     }
 

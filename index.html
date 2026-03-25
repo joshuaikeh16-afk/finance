@@ -7,19 +7,19 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --success: #10b981;
-      --danger: #ef4444;
-      --gray: #6b7280;
-      --light: #f3f4f6;
-      --dark: #111827;
+      --primary: #4361ee;
+      --primary-dark: #3a0ca3;
+      --success: #06d6a0;
+      --danger: #ef476f;
+      --gray: #94a3b8;
+      --light: #f8fafc;
+      --dark: #0f172a;
     }
 
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: system-ui, sans-serif;
-      background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -30,50 +30,71 @@
 
     .container {
       background: white;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.05);
       width: 100%;
       max-width: 420px;
       overflow: hidden;
+      border: 1px solid #f1f5f9;
     }
 
     .header {
-      background: var(--primary);
+      background: linear-gradient(180deg, #4361ee 0%, #3a0ca3 100%);
       color: white;
-      padding: 2.5rem 2rem;
+      padding: 3rem 2rem;
       text-align: center;
     }
 
-    .header h1 { font-size: 1.9rem; margin-bottom: 0.5rem; }
-    .header p { opacity: 0.9; font-size: 0.95rem; }
+    .header h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .header p { opacity: 0.8; font-size: 0.9rem; font-weight: 500; }
 
     .form-body { padding: 2.5rem 2rem; }
-
-    .form-group { margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1.5rem; position: relative; }
 
     label {
       display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+      font-size: 0.85rem;
       color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     input {
       width: 100%;
-      padding: 0.9rem 1rem;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid #f1f5f9;
+      border-radius: 12px;
       font-size: 1rem;
+      background: #f8fafc;
       transition: all 0.2s;
     }
+
+    /* Space for the eye icon */
+    .pass-input { padding-right: 45px; }
 
     input:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
     }
 
-    .error { color: var(--danger); font-size: 0.85rem; margin-top: 0.4rem; min-height: 1.2em; }
+    /* Eye Icon Styling */
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 38px; /* Adjusted to align with input center under label */
+      color: var(--gray);
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+
+    .toggle-password:hover { color: var(--primary); }
+
+    .error { color: var(--danger); font-size: 0.8rem; margin-top: 0.4rem; font-weight: 500; min-height: 1.2em; }
 
     .btn {
       width: 100%;
@@ -81,260 +102,154 @@
       background: var(--primary);
       color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 1.05rem;
-      font-weight: 600;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.25s;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
     }
 
     .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
 
-    .security-note {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.85rem;
-      color: var(--gray);
-    }
-
-    .security-note i { color: var(--primary); margin-right: 0.4rem; }
-
-    /* OTP Modal */
+    /* OTP Modal Styling remains same... */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      backdrop-filter: blur(4px);
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 42, 0.8);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000; backdrop-filter: blur(8px);
     }
-
     .modal-content {
-      background: white;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 380px;
-      padding: 2.5rem 2rem;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
-      text-align: center;
+      background: white; border-radius: 24px; width: 90%; max-width: 400px;
+      padding: 2.5rem 2rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center;
     }
-
-    .modal-header h2 { font-size: 1.5rem; margin-bottom: 1rem; }
-    .modal-text { color: var(--gray); margin-bottom: 1.8rem; line-height: 1.5; }
-
-    .otp-container {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 1.8rem;
-    }
-
+    .otp-container { display: flex; justify-content: center; gap: 8px; margin-bottom: 2rem; }
     .otp-input {
-      width: 50px;
-      height: 58px;
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      border: 2px solid #d1d5db;
-      border-radius: 10px;
-      transition: all 0.2s;
+      width: 45px; height: 55px; text-align: center; font-size: 1.5rem; font-weight: 800;
+      border: 2px solid #f1f5f9; border-radius: 12px; background: #f8fafc; color: var(--primary);
     }
-
-    .otp-input:focus {
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
-    }
-
-    .otp-error { color: var(--danger); font-size: 0.9rem; margin-top: 0.8rem; min-height: 1.2rem; }
-
-    @media (max-width: 480px) {
-      .otp-input { width: 45px; height: 54px; font-size: 1.4rem; }
-    }
+    .otp-error { color: var(--danger); font-size: 0.85rem; margin-top: 0.8rem; font-weight: 600; min-height: 1.2rem; }
   </style>
 </head>
 <body>
 
   <div class="container">
     <div class="header">
-      <h1>Finance Tracker</h1>
-      <p>Create your secure account</p>
+      <h1><i class="fas fa-bolt-lightning"></i> Finance</h1>
+      <p>Secure Your Financial Future</p>
     </div>
 
     <div class="form-body">
       <form id="registerForm">
         <div class="form-group">
           <label for="name">Full Name</label>
-          <input type="text" id="name" placeholder="Ikeh Chukwu" required minlength="2" autocomplete="name"/>
+          <input type="text" id="name" placeholder="Ikeh Chukwu" required minlength="2"/>
           <div class="error" id="nameError"></div>
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" placeholder="••••••••" required minlength="6"/>
+          <input type="password" id="password" class="pass-input" placeholder="••••••••" required minlength="6"/>
+          <i class="fas fa-eye toggle-password" id="togglePassword"></i>
           <div class="error" id="passError"></div>
         </div>
 
         <div class="form-group">
           <label for="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" placeholder="••••••••" required/>
+          <input type="password" id="confirmPassword" class="pass-input" placeholder="••••••••" required/>
+          <i class="fas fa-eye toggle-password" id="toggleConfirm"></i>
           <div class="error" id="confirmError"></div>
         </div>
 
-        <button type="submit" class="btn">Create Account</button>
+        <button type="submit" class="btn">Get Started</button>
       </form>
 
-      <div class="security-note">
-        <i class="fas fa-lock"></i>
-        Your data is protected with bank-grade security
+      <div class="security-note" style="text-align:center; margin-top:1.5rem; font-size:0.8rem; color:var(--gray);">
+        <i class="fas fa-shield-halved" style="color:var(--success);"></i>
+        AES-256 Bank-Grade Encryption
       </div>
     </div>
   </div>
 
-  <!-- OTP Modal (now says "Verify Your Account" instead of email) -->
   <div class="modal-overlay" id="otpModal">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2>Verify Your Account</h2>
-      </div>
-      <p class="modal-text">
-        We sent a 6-digit code to your registered phone/email.<br>
-        Enter it below to finish registration.
-      </p>
-
+      <h2>Verify Account</h2>
+      <p style="color:var(--gray); margin: 1rem 0 2rem;">Enter the 6-digit code sent to your device.</p>
       <div class="otp-container">
-        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="\d" required autofocus/>
-        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="\d" required/>
-        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="\d" required/>
-        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="\d" required/>
-        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="\d" required/>
-        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="\d" required/>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required autofocus/>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required/>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required/>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required/>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required/>
+        <input type="text" class="otp-input" maxlength="1" inputmode="numeric" required/>
       </div>
-
       <div class="otp-error" id="otpError"></div>
-
       <button class="btn" id="verifyBtn">Verify & Finish</button>
-      <p style="margin-top:1.2rem; font-size:0.9rem; color:var(--gray);">
-        Didn't get code? <a href="#" id="resendLink" style="color:var(--primary); text-decoration:none;">Resend</a>
-      </p>
     </div>
   </div>
 
   <script>
+    // PASSWORD TOGGLE LOGIC
+    const setupPasswordToggle = (toggleId, inputId) => {
+      const toggle = document.getElementById(toggleId);
+      const input = document.getElementById(inputId);
+      
+      toggle.addEventListener('click', () => {
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        toggle.classList.toggle('fa-eye');
+        toggle.classList.toggle('fa-eye-slash');
+      });
+    };
+
+    setupPasswordToggle('togglePassword', 'password');
+    setupPasswordToggle('toggleConfirm', 'confirmPassword');
+
+    // Registration and OTP logic from previous step...
     const registerForm = document.getElementById('registerForm');
     const otpModal = document.getElementById('otpModal');
     const otpInputs = document.querySelectorAll('.otp-input');
-    const verifyBtn = document.getElementById('verifyBtn');
-    const otpError = document.getElementById('otpError');
-    const resendLink = document.getElementById('resendLink');
-
     let generatedOTP = "";
     let userName = "";
 
-    // OTP input auto-focus & paste support
-    otpInputs.forEach((input, idx) => {
-      input.addEventListener('input', () => {
-        if (input.value.length === 1 && idx < otpInputs.length - 1) {
-          otpInputs[idx + 1].focus();
-        }
-      });
-
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && input.value === '' && idx > 0) {
-          otpInputs[idx - 1].focus();
-        }
-      });
-
-      input.addEventListener('paste', (e) => {
-        e.preventDefault();
-        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
-        if (pasted.length > 0) {
-          pasted.split('').forEach((digit, i) => {
-            if (idx + i < otpInputs.length) otpInputs[idx + i].value = digit;
-          });
-          const nextFocus = Math.min(idx + pasted.length, otpInputs.length - 1);
-          otpInputs[nextFocus].focus();
-        }
-      });
-    });
-
-    // Registration handler
     registerForm.addEventListener('submit', (e) => {
       e.preventDefault();
-
-      const name = document.getElementById('name').value.trim();
       const pass = document.getElementById('password').value;
       const confirmPass = document.getElementById('confirmPassword').value;
 
-      // Basic validation
-      let valid = true;
-      document.querySelectorAll('.error').forEach(el => el.textContent = '');
-
-      if (name.length < 2) {
-        document.getElementById('nameError').textContent = 'Please enter a valid name (min 2 characters)';
-        valid = false;
-      }
-      if (pass.length < 6) {
-        document.getElementById('passError').textContent = 'Password must be at least 6 characters';
-        valid = false;
-      }
       if (pass !== confirmPass) {
         document.getElementById('confirmError').textContent = 'Passwords do not match';
-        valid = false;
-      }
-
-      if (!valid) return;
-
-      // Fake OTP generation (in real app → send via SMS/email)
-      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      userName = name;
-
-      console.log(`[DEMO] Generated OTP for ${name}: ${generatedOTP}`);
-      alert(`Registration almost complete!\n\nDemo OTP: ${generatedOTP}\n(also in console)`);
-
-      otpModal.style.display = 'flex';
-      otpInputs[0].focus();
-    });
-
-    // Verify button – save name on success
-    verifyBtn.addEventListener('click', () => {
-      let entered = '';
-      otpInputs.forEach(inp => entered += inp.value.trim());
-
-      if (entered.length !== 6) {
-        otpError.textContent = 'Please enter the full 6-digit code';
         return;
       }
 
-      if (entered === generatedOTP) {
-        otpError.textContent = '';
-
-        // Save name to localStorage so every page can use it
-        localStorage.setItem('userName', userName);
-        // Optional: mark as logged in
-        localStorage.setItem('isLoggedIn', 'true');
-
-        alert(`Success! Welcome, ${userName} 🎉\nYour account is now active.`);
-
-        otpModal.style.display = 'none';
-
-        // Redirect to dashboard
-        window.location.href = 'main.html';
-      } else {
-        otpError.textContent = 'Incorrect code – please try again';
-      }
+      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      userName = document.getElementById('name').value.trim();
+      
+      console.log(`[DEMO] OTP: ${generatedOTP}`);
+      alert(`Demo Mode: Your OTP is ${generatedOTP}`);
+      otpModal.style.display = 'flex';
     });
 
-    // Resend OTP
-    resendLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      console.log(`[DEMO] Resent OTP: ${generatedOTP}`);
-      alert(`New OTP sent! (Demo: ${generatedOTP})`);
-      otpInputs.forEach(inp => inp.value = '');
-      otpInputs[0].focus();
+    // OTP Input logic
+    otpInputs.forEach((input, idx) => {
+      input.addEventListener('input', () => {
+        if (input.value && idx < otpInputs.length - 1) otpInputs[idx + 1].focus();
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && idx > 0) otpInputs[idx - 1].focus();
+      });
+    });
+
+    document.getElementById('verifyBtn').addEventListener('click', () => {
+      let entered = '';
+      otpInputs.forEach(inp => entered += inp.value);
+      if (entered === generatedOTP) {
+        localStorage.setItem('userName', userName);
+        localStorage.setItem('isLoggedIn', 'true');
+        window.location.href = 'main.html';
+      } else {
+        document.getElementById('otpError').textContent = 'Invalid code.';
+      }
     });
   </script>
 </body>

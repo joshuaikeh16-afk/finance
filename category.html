@@ -6,113 +6,173 @@
   <title>Finance Tracker • Categories</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
+    /* 1. DYNAMIC COLOR VARIABLES */
     :root {
-      --primary: #2563eb;
-      --success: #10b981;
-      --danger: #ef4444;
-      --gray: #6b7280;
-      --light: #f3f4f6;
-      --dark: #111827;
-      --sidebar-width: 260px;
+      --bg-body: #f8fafc;
+      --bg-panel: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #94a3b8;
+      --border-color: #f1f5f9;
+      --input-bg: #f8fafc;
+      
+      --primary: #4361ee;
+      --success: #06d6a0;
+      --danger: #ef476f;
+      --warning: #ffd166;
+      --sidebar-grad: linear-gradient(180deg, #4361ee 0%, #3a0ca3 100%);
     }
 
-    * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, sans-serif; }
-    body { display: flex; background: var(--light); min-height: 100vh; }
+    /* 2. DARK MODE OVERRIDES */
+    body.dark-mode {
+      --bg-body: #0f172a;
+      --bg-panel: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #64748b;
+      --border-color: #334155;
+      --input-bg: #1e293b;
+      --sidebar-grad: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    }
 
-    /* Sidebar - Matching your layout */
-    .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid #e5e7eb; padding: 1.5rem 0; height: 100vh; position: sticky; top: 0; }
-    .logo { padding: 0 1.5rem 2rem; font-size: 1.6rem; font-weight: 700; color: var(--primary); text-align: center; }
-    .nav-item a { display: flex; align-items: center; padding: 0.95rem 1.5rem; color: var(--gray); text-decoration: none; font-weight: 500; }
-    .nav-item a.active { background: #eff6ff; color: var(--primary); border-right: 4px solid var(--primary); }
-    .nav-item i { margin-right: 1rem; width: 24px; text-align: center; }
+    * { margin:0; padding:0; box-sizing:border-box; transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; }
+
+    /* Sidebar */
+    .sidebar { width: 260px; background: var(--sidebar-grad); color: white; height: 100vh; position: sticky; top: 0; padding-top: 2rem; box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 100; }
+    .logo { padding: 0 2rem 2.5rem; font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+    .nav-item a { display: flex; align-items: center; padding: 1rem 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 500; }
+    .nav-item a.active { background: white; color: var(--primary); border-radius: 0 50px 50px 0; margin-right: 1rem; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+    .nav-item i { width: 30px; font-size: 1.1rem; }
 
     /* Main Content */
-    .main-content { flex: 1; padding: 2rem; }
-    .header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .main-content { flex: 1; padding: 2.5rem 3.5rem; overflow-y: auto; }
+    .header { margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; }
     
-    .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
     
-    .category-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      transition: transform 0.2s;
+    /* Coach/Health Card */
+    .health-card {
+      grid-column: 1 / -1;
+      padding: 2rem;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      margin-bottom: 1rem;
     }
-    .category-card:hover { transform: translateY(-3px); }
+    .health-icon {
+      width: 60px; height: 60px; border-radius: 18px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0;
+    }
 
-    .cat-header { display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center; }
-    .cat-name { font-weight: 700; font-size: 1.1rem; color: var(--dark); }
-    .cat-amount { font-weight: 700; color: var(--danger); }
+    /* Standard Cards */
+    .category-card {
+      background: var(--bg-panel);
+      padding: 1.8rem;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      border: 1px solid var(--border-color);
+    }
+    .category-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+
+    .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+    .cat-name { font-weight: 800; font-size: 0.9rem; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; }
+    .cat-amount { font-family: 'Monaco', monospace; font-weight: 800; font-size: 1.1rem; color: var(--danger); }
     
-    /* Progress Bar */
-    .progress-container { background: #edf2f7; height: 8px; border-radius: 10px; overflow: hidden; margin-bottom: 0.5rem; }
-    .progress-bar { background: var(--primary); height: 100%; border-radius: 10px; transition: width 0.5s ease-in-out; }
-    .cat-meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--gray); }
+    /* Sleek Progress Bar */
+    .progress-container { background: var(--bg-body); height: 10px; border-radius: 20px; overflow: hidden; margin-bottom: 0.8rem; }
+    .progress-bar { background: var(--primary); height: 100%; border-radius: 20px; }
+    
+    .cat-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; }
 
-    .empty-state { text-align: center; padding: 4rem; color: var(--gray); grid-column: 1/-1; }
-    .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
+    .badge-pill { padding: 8px 18px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; }
+
+    #userInitials { 
+        width:40px; height:40px; background:white; color:var(--primary); 
+        border-radius:12px; display:flex; align-items:center; justify-content:center; 
+        font-weight:bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+    }
   </style>
 </head>
 <body>
 
+  <script>
+    (function initTheme() {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+      }
+    })();
+  </script>
+
   <aside class="sidebar">
-    <div class="logo">Finance</div>
+    <div class="logo"><i class="fas fa-bolt-lightning"></i> Finance</div>
     <ul style="list-style:none;">
-      <li class="nav-item"><a href="main.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+      <li class="nav-item"><a href="main.html"><i class="fas fa-grid-2"></i><span>Dashboard</span></a></li>
       <li class="nav-item"><a href="account.html"><i class="fas fa-wallet"></i><span>Accounts</span></a></li>
-      <li class="nav-item"><a href="analytic.html"><i class="fas fa-chart-pie"></i><span>Analytics</span></a></li>
+      <li class="nav-item"><a href="analytic.html"><i class="fas fa-chart-line"></i><span>Analytics</span></a></li>
       <li class="nav-item"><a href="trans.html"><i class="fas fa-exchange-alt"></i><span>Transactions</span></a></li>
-      <li class="nav-item"><a href="category.html" class="active"><i class="fas fa-tags"></i><span>Categories</span></a></li>
-      <li class="nav-item"><a href="setting.html"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+      <li class="nav-item"><a href="category.html" class="active"><i class="fas fa-layer-group"></i><span>Categories</span></a></li>
+      <li class="nav-item"><a href="setting.html"><i class="fas fa-sliders-h"></i><span>Settings</span></a></li>
     </ul>
+    <div style="position:absolute; bottom:20px; left:20px; display:flex; align-items:center; gap:12px;">
+        <div id="userInitials">??</div>
+        <div style="font-size:0.85rem; font-weight:600; opacity:0.8;" id="sidebarName">Guest User</div>
+    </div>
   </aside>
 
   <main class="main-content">
     <div class="header">
-      <h1>Spending by Category</h1>
-      <div id="totalExpenseBadge" style="background:var(--danger); color:white; padding:5px 15px; border-radius:20px; font-size:0.9rem; font-weight:600;">
-        Total Spent: ₦ 0
+      <h1>Spending Breakdown</h1>
+      <div id="totalExpenseBadge" class="badge-pill" style="background:rgba(239, 71, 111, 0.15); color:var(--danger);">
+        Total Outflow: ₦ 0
       </div>
     </div>
 
-    <div class="category-grid" id="categoryGrid">
-      </div>
+    <div class="category-grid" id="categoryGrid"></div>
   </main>
 
 <script>
+  window.onload = function() {
+    syncUserIdentity();
+    renderCategories();
+  };
+
+  function syncUserIdentity() {
+    const savedName = localStorage.getItem('userName') || "Guest User";
+    const initials = savedName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+    
+    document.getElementById('sidebarName').innerText = savedName;
+    document.getElementById('userInitials').innerText = initials;
+  }
+
   function renderCategories() {
-    // 1. Get shared data from memory
     const txns = JSON.parse(localStorage.getItem('myTransactions')) || [];
     const grid = document.getElementById('categoryGrid');
     if (!grid) return;
     grid.innerHTML = '';
 
-    // 2. Separate Income from Expenses
-    const expenseTxns = txns.filter(t => t.type === 'expense' || t.amt < 0);
-    const incomeTxns = txns.filter(t => t.type === 'income' || t.amt > 0);
+    const expenseTxns = txns.filter(t => t.type === 'expense');
+    const incomeTxns = txns.filter(t => t.type === 'income');
     
     let totalSpent = 0;
     let totalEarned = 0;
 
-    // Calculate absolute totals
     expenseTxns.forEach(t => totalSpent += Math.abs(t.amt));
     incomeTxns.forEach(t => totalEarned += Math.abs(t.amt));
 
     if (txns.length === 0) {
       grid.innerHTML = `
-        <div class="empty-state" style="grid-column: 1/-1; text-align:center; padding: 3rem;">
-          <i class="fas fa-wallet" style="font-size: 3rem; opacity: 0.2;"></i>
-          <p>No transactions found. Add some data to see your analysis!</p>
+        <div style="grid-column: 1/-1; text-align:center; padding: 5rem; color: var(--text-muted);">
+          <i class="fas fa-tags" style="font-size: 4rem; opacity: 0.1; margin-bottom: 1.5rem;"></i>
+          <p style="font-weight: 600;">No spending history found. Start loggin transactions!</p>
         </div>`;
       return;
     }
 
-    // 3. Profit vs Loss Logic (The "Advice" Logic)
     const isProfit = totalEarned >= totalSpent;
     const diff = Math.abs(totalEarned - totalSpent);
     
-    // Group expense totals for the advice engine
     const categoryTotals = {};
     expenseTxns.forEach(t => {
       const amt = Math.abs(t.amt);
@@ -122,68 +182,69 @@
     const sortedCats = Object.keys(categoryTotals).sort((a, b) => categoryTotals[b] - categoryTotals[a]);
     const topCat = sortedCats[0] || "General";
 
-    // 4. Generate Status Card
-    const statusHTML = generateStatusCard(isProfit, diff, topCat);
-    grid.innerHTML = statusHTML;
+    // Inject Cards
+    grid.innerHTML = generateHealthCard(isProfit, diff, topCat);
 
-    // 5. Create individual Category Progress Cards
     sortedCats.forEach(catName => {
       const amount = categoryTotals[catName];
       const percentage = totalSpent > 0 ? ((amount / totalSpent) * 100).toFixed(1) : 0;
+      const txCount = expenseTxns.filter(t => t.cat === catName).length;
 
       grid.innerHTML += `
         <div class="category-card">
-          <div class="cat-header" style="display:flex; justify-content:space-between; margin-bottom:10px;">
-            <span class="cat-name" style="font-weight:600;">${catName}</span>
-            <span class="cat-amount" style="font-weight:700; color:var(--danger);">₦ ${amount.toLocaleString()}</span>
+          <div class="cat-header">
+            <span class="cat-name">${catName}</span>
+            <span class="cat-amount">₦${amount.toLocaleString()}</span>
           </div>
-          <div class="progress-container" style="background:#eee; height:8px; border-radius:10px; overflow:hidden;">
-            <div class="progress-bar" style="width: ${percentage}%; background:var(--primary); height:100%;"></div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${percentage}%; background: ${getCatColor(percentage)}"></div>
           </div>
-          <div class="cat-meta" style="display:flex; justify-content:space-between; font-size:0.8rem; margin-top:8px; color:var(--gray);">
-            <span>${percentage}% of expenses</span>
-            <span>${expenseTxns.filter(t => t.cat === catName).length} Transactions</span>
+          <div class="cat-meta">
+            <span>${percentage}% OF TOTAL SPEND</span>
+            <span>${txCount} TRANSACTIONS</span>
           </div>
         </div>
       `;
     });
 
-    // Update the badge in the header
-    const badge = document.getElementById('totalExpenseBadge');
-    if (badge) badge.innerText = `Total Spent: ₦ ${totalSpent.toLocaleString()}`;
+    document.getElementById('totalExpenseBadge').innerText = `Total Outflow: ₦ ${totalSpent.toLocaleString()}`;
   }
 
-  function generateStatusCard(isProfit, diff, topCat) {
-    const color = isProfit ? 'var(--success)' : 'var(--danger)';
-    const bg = isProfit ? '#ecfdf5' : '#fff1f2';
-    const icon = isProfit ? 'fa-smile-beam' : 'fa-chart-line';
+  function getCatColor(percent) {
+    if (percent > 40) return 'var(--danger)';
+    if (percent > 20) return 'var(--warning)';
+    return 'var(--primary)';
+  }
+
+  function generateHealthCard(isProfit, diff, topCat) {
+    const theme = isProfit ? 
+      { color: 'var(--success)', bg: 'rgba(6, 214, 160, 0.12)', icon: 'fa-heart-pulse', title: 'Healthy Status' } : 
+      { color: 'var(--danger)', bg: 'rgba(239, 71, 111, 0.12)', icon: 'fa-triangle-exclamation', title: 'Spending Alert' };
     
-    let message = "";
-    if (isProfit) {
-      message = `**Keep it up!** You're currently in profit by **₦${diff.toLocaleString()}**. Your financial habits are looking solid this period.`;
-    } else {
-      const advice = {
-        'Food': "Eating out is your biggest drain. Try meal prepping for just 3 days this week to save.",
-        'Transport': "Transport costs are peaking. Consider carpooling or off-peak travel to cut this down.",
-        'Shopping': "Impulse buys are hurting your balance. Try the '24-hour rule' before buying non-essentials.",
-        'General': "Your expenses are higher than your income. Look for small subscriptions you can cancel."
-      };
-      message = `**Heads up!** You've spent **₦${diff.toLocaleString()}** more than you've earned. Your spending in **${topCat}** is quite high. ${advice[topCat] || advice['General']}`;
-    }
+    const advice = {
+      'Food': "Groceries and dining are high. Meal planning could save you a fortune this month.",
+      'Transport': "Logistics costs are peaking. Check if there are monthly passes or cheaper alternatives.",
+      'Shopping': "Wants vs Needs! Try the 30-day rule: wait a month before buying non-essentials.",
+      'Salary': "Income is stable, keep monitoring those outflows!",
+      'General': "Your spending is outpacing your earnings. It's time to pause and prioritize."
+    };
+
+    const message = isProfit ? 
+      `Doing great! You've saved <strong>₦${diff.toLocaleString()}</strong> more than you spent. Ready to invest?` :
+      `You've exceeded your income by <strong>₦${diff.toLocaleString()}</strong>. ${advice[topCat] || advice['General']}`;
 
     return `
-      <div class="category-card" style="grid-column: 1/-1; border-left: 5px solid ${color}; background: ${bg}; padding: 1.5rem;">
-        <div class="cat-header" style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-          <i class="fas ${icon}" style="color:${color}; font-size:1.2rem;"></i>
-          <span style="font-weight:700; color:${color}; font-size:1.1rem;">Financial Health: ${isProfit ? 'Profitable' : 'Deficit'}</span>
+      <div class="health-card" style="background: ${theme.bg}; border: 1px solid ${theme.color}44;">
+        <div class="health-icon" style="background: ${theme.color}; color: white;">
+          <i class="fas ${theme.icon}"></i>
         </div>
-        <p style="font-size:0.95rem; color:#444; line-height:1.5;">${message}</p>
+        <div>
+          <h3 style="color: ${theme.color}; margin-bottom: 5px; font-weight:800;">${theme.title}</h3>
+          <p style="line-height: 1.6; font-size: 0.95rem; color: var(--text-main); opacity: 0.9;">${message}</p>
+        </div>
       </div>
     `;
   }
-
-  // Run on load
-  window.onload = renderCategories;
 </script>
 </body>
 </html>
